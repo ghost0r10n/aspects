@@ -3,14 +3,14 @@ part of aspects;
 
 
 
-class AEngine{
+class AspectProcessors{
 	
 	late MirrorSystem mirrorSystem;
 	
 
 	Map<Symbol, ClassMirror> aspects = {};
 
-	AEngine(){
+	AspectProcessors(){
 		mirrorSystem = currentMirrorSystem();
 	}
 
@@ -61,28 +61,16 @@ class AEngine{
 		//Get all filtered LibraryMirror
 		List<LibraryMirror> libraries = filterLibraries(mirrorLibraries);
 
-
 		for (LibraryMirror mirror in libraries){
 			mirror.declarations.forEach((key, value) {
+				print(value);
 				if(
 					value is ClassMirror &&
 					value.metadata.isNotEmpty &&
 					value.metadata.first.reflectee is Aspect ){
 					
 					addAspect(value.simpleName, value);
-				/*	
-					value.declarations.forEach((key, value) {
-						if(!_aspects.keys.contains(key) && value is MethodMirror && value.source!= null){
-						
-						String simpleNameCleaned = key.toString().replaceAll('Symbol("', "").replaceAll('")', "");
-							String code = "";
-							code += "class ${simpleNameCleaned} extends Aspect{";
-							code+= value.source!;
-							code+="";
-							addAspect(key,code);
-						}
-					});	*/
-				}
+								}
 			});	
 		}
 		
@@ -90,40 +78,39 @@ class AEngine{
 	}
 
 
+	String symbolToString(Symbol symbol)=>symbol.toString().replaceAll('Symbol("', "").replaceAll('")', "");
 
 
+	dynamic engineRun(String methodName){
 
-	dynamic engineRun(){
-
-		print(aspects);
 		//Get all libraries 
 		Map<Uri,LibraryMirror> mirrorLibraries = mirrorSystem.libraries;
 		
 		//Get all filtered LibraryMirror
 		List<LibraryMirror> libraries = filterLibraries(mirrorLibraries);
-
+				
 
 		for (LibraryMirror mirror in libraries){
 			mirror.declarations.forEach((key, value) {
-							if(value.metadata.isNotEmpty){
+			if(value.metadata.isNotEmpty){
 				
-				print(value.metadata.first);
 				
 				ClassMirror? classMirror = isInAnnotations(value.metadata.first.reflectee);
-				print(classMirror);
 				if(
 					value is MethodMirror &&
 					value.metadata.isNotEmpty &&
 					classMirror!=null&&
 					value.source != null){
-					print("ao");	
-					if(classMirror.staticMembers.containsKey(Symbol("before"))){
-						classMirror.invoke(#before, []);			
+					if(symbolToString(value.simpleName) ==  methodName){
+	
+						if(classMirror.staticMembers.containsKey(Symbol("before")))classMirror.invoke(#before, []);
+						mirror.invoke(value.simpleName, []);	
+						if(classMirror.staticMembers.containsKey(Symbol("after"))) classMirror.invoke(#after,[]);
 					}
-					run(value.source!, value.simpleName);
-					if(classMirror.staticMembers.containsKey(Symbol("after"))) classMirror.invoke(#after,[], []);
 				}
-				}
+			}
+				
+				
 			});	
 		}
 	}
@@ -152,10 +139,7 @@ class AEngine{
 	dynamic run(String source, Symbol simpleName) async{
 		String compiledSource = prepareCodeToExecute(source, simpleName);
 		Uri uri = Uri.dataFromString(compiledSource);
-		final port = ReceivePort();
-		Isolate.spawnUri(uri, [], null);
-	//	final String response = await port.first;
-	//	print(response);
+		await Isolate.spawnUri(uri, [], null).then((value) => value.kill());
 	}
 }
 
