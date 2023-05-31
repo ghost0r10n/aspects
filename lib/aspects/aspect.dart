@@ -13,7 +13,7 @@ class Aspect{
 
 	
 
-	static void before(){print("hello motherfucker");}
+	static void before(){}
 	static void after(){}
 	
 }

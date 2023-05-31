@@ -11,6 +11,6 @@ import 'dart:isolate';
 
 
 
-part 'aspect_engine.dart';
+part 'aspects/aspect_engine.dart';
 part 'aspects/aspect.dart';
 
