@@ -1,12 +1,14 @@
+import 'functions/functions.dart';
 import 'package:aspects/aspects.dart';
 
 
 
-void main()async{
+void main(){
 	AspectEventEngine aspectEventEngine = AspectEventEngine();
-	
+	print( "Start listening for events...");	
 	 aspectEventEngine.aspectsStream.listen((event) {
-		print("method => $event WAS CALLED");
+	 	print("EVENT $event received");
+		aspectEventEngine.listenRun(event);
 	});
 
 
