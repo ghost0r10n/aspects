@@ -1,43 +1,22 @@
+import 'functions/functions.dart';
 import 'package:aspects/aspects.dart';
 
-void main(List<String> arguments) {
-
-	AEngine aEngine = AEngine();
 
 
-	aEngine.prepareAspects();
-	print(aEngine.aspects);
-	aEngine.engineRun();
+void main(){
+	AspectEventEngine aspectEventEngine = AspectEventEngine();
+	print( "Start listening for events...");	
+	 aspectEventEngine.aspectsStream.listen((event) {
+	 	print("EVENT $event received");
+		aspectEventEngine.listenRun(event);
+	});
 
 
+	aspectEventEngine.emit("function");
 }
 
 
 
 
-
-
-@Log()
-void hello(){print("Ciao bello");}
-
-
-
-
-
-
-
-
-@Aspect()
-class Log extends Aspect{
-
-	const Log();
-
-
-
-	static void before(){
-		print("hello zi");
-	}
-
-}
 
 

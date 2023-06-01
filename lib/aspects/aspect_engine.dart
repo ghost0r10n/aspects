@@ -25,7 +25,7 @@ class AspectProcessors{
 	List<LibraryMirror> filterLibraries(Map<Uri,LibraryMirror> toFilterList){
 		List<LibraryMirror> newList = [];
 		toFilterList.forEach((key, value) { 
-			if(!key.toString().contains("dart:")&&!key.toString().contains("package:")){
+			if(!key.toString().contains("dart:")){
 				newList.add(value);
 			}
 		});
@@ -63,7 +63,6 @@ class AspectProcessors{
 
 		for (LibraryMirror mirror in libraries){
 			mirror.declarations.forEach((key, value) {
-				print(value);
 				if(
 					value is ClassMirror &&
 					value.metadata.isNotEmpty &&
@@ -83,8 +82,12 @@ class AspectProcessors{
 
 	dynamic engineRun(String methodName){
 
+		prepareAspects();
+		
 		//Get all libraries 
 		Map<Uri,LibraryMirror> mirrorLibraries = mirrorSystem.libraries;
+
+
 		
 		//Get all filtered LibraryMirror
 		List<LibraryMirror> libraries = filterLibraries(mirrorLibraries);
@@ -92,9 +95,8 @@ class AspectProcessors{
 
 		for (LibraryMirror mirror in libraries){
 			mirror.declarations.forEach((key, value) {
-			if(value.metadata.isNotEmpty){
-				
-				
+
+				if(value.metadata.isNotEmpty){
 				ClassMirror? classMirror = isInAnnotations(value.metadata.first.reflectee);
 				if(
 					value is MethodMirror &&
