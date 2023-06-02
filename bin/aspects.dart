@@ -12,7 +12,11 @@ void main(){
 	});
 
 
-	aspectEventEngine.emit("function");
+
+	aspectEventEngine.emit(AspectEvent("function",args: ["Fabio"]));
+	aspectEventEngine.emit(AspectEvent("function2"));
+	
+
 }
 
 

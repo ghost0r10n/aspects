@@ -80,7 +80,7 @@ class AspectProcessors{
 	String symbolToString(Symbol symbol)=>symbol.toString().replaceAll('Symbol("', "").replaceAll('")', "");
 
 
-	dynamic engineRun(String methodName){
+	dynamic engineRun(AspectEvent aspectEvent){
 
 		prepareAspects();
 		
@@ -99,15 +99,15 @@ class AspectProcessors{
 				if(value.metadata.isNotEmpty){
 				ClassMirror? classMirror = isInAnnotations(value.metadata.first.reflectee);
 				if(
-					value is MethodMirror &&
+						value is MethodMirror &&
 					value.metadata.isNotEmpty &&
 					classMirror!=null&&
 					value.source != null){
-					if(symbolToString(value.simpleName) ==  methodName){
+					if(symbolToString(value.simpleName) ==  aspectEvent.functionEventName){
 	
-						if(classMirror.staticMembers.containsKey(Symbol("before")))classMirror.invoke(#before, []);
-						mirror.invoke(value.simpleName, []);	
-						if(classMirror.staticMembers.containsKey(Symbol("after"))) classMirror.invoke(#after,[]);
+						if(classMirror.staticMembers.containsKey(Symbol("before")))classMirror.invoke(#before, [], {Symbol("args"): aspectEvent.args});
+						mirror.invoke(Symbol(aspectEvent.functionEventName), aspectEvent.args);	
+						if(classMirror.staticMembers.containsKey(Symbol("after"))) classMirror.invoke(#after,[],{Symbol("args"): aspectEvent.args});
 					}
 				}
 			}
@@ -136,7 +136,7 @@ class AspectProcessors{
 			throw Exception("The source of the function is empty");
 		}
 		return codeToExecute;
-	}
+}
 	
 	dynamic run(String source, Symbol simpleName) async{
 		String compiledSource = prepareCodeToExecute(source, simpleName);
