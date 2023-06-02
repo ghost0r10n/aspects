@@ -10,16 +10,16 @@ class AspectEventEngine{
 	}
 
 
-	void emit(String methodName){
+	void emit(AspectEvent methodName){
 		print("Emitting event for  => $methodName");
 		streamController.add(methodName);
 	}
 
 	Stream get aspectsStream => streamController.stream;
+
 	
 
-	void listenRun(String methodName){
-		print("EVENT $methodName arrived to engine");
-		aspectProcessors.engineRun(methodName);	
+	void listenRun(AspectEvent aspectEvent){
+		aspectProcessors.engineRun(aspectEvent);	
 	}
 }
