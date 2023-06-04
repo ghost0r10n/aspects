@@ -80,7 +80,11 @@ class AspectProcessors{
 	String symbolToString(Symbol symbol)=>symbol.toString().replaceAll('Symbol("', "").replaceAll('")', "");
 
 
-	dynamic engineRun(AspectEvent aspectEvent){
+	dynamic engineRun(AspectEvent aspectEvent) async{
+
+
+		//preparing a result allocation variable
+		dynamic finalResult;
 
 		prepareAspects();
 		
@@ -94,8 +98,9 @@ class AspectProcessors{
 				
 
 		for (LibraryMirror mirror in libraries){
-			mirror.declarations.forEach((key, value) {
-
+			for(MapEntry<Symbol, DeclarationMirror> entry in mirror.declarations.entries){
+				DeclarationMirror value = entry.value;
+				Symbol key = entry.key;
 				if(value.metadata.isNotEmpty){
 				ClassMirror? classMirror = isInAnnotations(value.metadata.first.reflectee);
 				if(
@@ -104,17 +109,28 @@ class AspectProcessors{
 					classMirror!=null&&
 					value.source != null){
 					if(symbolToString(value.simpleName) ==  aspectEvent.functionEventName){
-	
+
 						if(classMirror.staticMembers.containsKey(Symbol("before")))classMirror.invoke(#before, [], {Symbol("args"): aspectEvent.args});
-						mirror.invoke(Symbol(aspectEvent.functionEventName), aspectEvent.args);	
+						
+
+
+					
+						InstanceMirror result = mirror.invoke(Symbol(aspectEvent.functionEventName), aspectEvent.args);	
+						if(result.reflectee is Future<dynamic>){
+							finalResult = await result.reflectee;
+						}
+
+
 						if(classMirror.staticMembers.containsKey(Symbol("after"))) classMirror.invoke(#after,[],{Symbol("args"): aspectEvent.args});
+				
 					}
 				}
 			}
 				
 				
-			});	
+			}	
 		}
+		return finalResult;
 	}
 		
 	String prepareCodeToExecute(String? baseSource, Symbol simpleName){

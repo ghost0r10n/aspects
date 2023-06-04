@@ -6,10 +6,8 @@ part of test;
 
 
 @Route()
-void function(String name) async{
-	print("START 1");	
-	await Future.delayed(Duration(seconds: 1));
-	print("Finish 1");
+Future<String> function(String name) async{
+	return "Hello there $name";
 }
 
 

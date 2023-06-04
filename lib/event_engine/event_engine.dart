@@ -19,7 +19,7 @@ class AspectEventEngine{
 
 	
 
-	void listenRun(AspectEvent aspectEvent){
-		aspectProcessors.engineRun(aspectEvent);	
+	dynamic listenRun(AspectEvent aspectEvent){
+		return aspectProcessors.engineRun(aspectEvent);	
 	}
 }
