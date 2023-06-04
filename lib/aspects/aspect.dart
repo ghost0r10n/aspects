@@ -1,19 +1,13 @@
 part of aspects;
 
-
-
-class Aspect{
-	/*
+class Aspect {
+  /*
 		This class can be extended to create
 		custom annotations for your program
 	*/
 
+  const Aspect();
 
-	const Aspect();
-
-	
-
-	static void before(){}
-	static void after(){}
-	
+  static void before() {}
+  static void after() {}
 }
