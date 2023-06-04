@@ -1,14 +1,9 @@
 part of aspects;
 
+class AspectEvent {
+  String functionEventName;
 
-class AspectEvent{
-	
-	String functionEventName;
-	
-	List<dynamic> args = [];
+  List<dynamic> args = [];
 
-	AspectEvent(this.functionEventName,{this.args = const []});
-
-
-
+  AspectEvent(this.functionEventName, {this.args = const []});
 }
