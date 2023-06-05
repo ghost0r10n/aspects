@@ -9,7 +9,6 @@ class AspectEventEngine {
   }
 
   void emit(AspectEvent methodName) {
-    print("Emitting event for  => $methodName");
     streamController.add(methodName);
   }
 

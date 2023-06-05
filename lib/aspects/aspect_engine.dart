@@ -7,6 +7,8 @@ class AspectProcessors {
 
   AspectProcessors() {
     mirrorSystem = currentMirrorSystem();
+    prepareAspects();
+
   }
 
   void addAspect(Symbol symbol, ClassMirror annotation) {
@@ -16,7 +18,8 @@ class AspectProcessors {
   List<LibraryMirror> filterLibraries(Map<Uri, LibraryMirror> toFilterList) {
     List<LibraryMirror> newList = [];
     toFilterList.forEach((key, value) {
-      if (!key.toString().contains("dart:")) {
+
+      if (!key.toString().contains("dart:") && key.toString().contains("file:")) {
         newList.add(value);
       }
     });
@@ -60,7 +63,6 @@ class AspectProcessors {
     //preparing a result allocation variable
     dynamic finalResult;
 
-    prepareAspects();
 
     //Get all libraries
     Map<Uri, LibraryMirror> mirrorLibraries = mirrorSystem.libraries;
@@ -104,31 +106,5 @@ class AspectProcessors {
     return finalResult;
   }
 
-  String prepareCodeToExecute(String? baseSource, Symbol simpleName) {
-    String codeToExecute = "";
-    if (baseSource != null) {
-      String simpleNameToStringRaw = simpleName.toString();
-      String simpleNameCleaned =
-          simpleNameToStringRaw.replaceAll('Symbol("', "").replaceAll('")', "");
 
-      codeToExecute += baseSource.replaceAll(simpleNameCleaned, "main");
-
-      aspects.forEach((key, value) {
-        String clazz = value.simpleName
-            .toString()
-            .replaceAll('Symbol("', "")
-            .replaceAll('")', "");
-        codeToExecute += "class $clazz{const $clazz();}";
-      });
-    } else {
-      throw Exception("The source of the function is empty");
-    }
-    return codeToExecute;
-  }
-
-  dynamic run(String source, Symbol simpleName) async {
-    String compiledSource = prepareCodeToExecute(source, simpleName);
-    Uri uri = Uri.dataFromString(compiledSource);
-    await Isolate.spawnUri(uri, [], null).then((value) => value.kill());
-  }
 }
